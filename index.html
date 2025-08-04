@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Productivity Timer with Design Breaks</title>
 
-  <!-- Tailwind CSS v2.0.3 (you can upgrade if you want more colors) -->
+  <!-- Tailwind CSS v2.0.3 -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
@@ -15,6 +15,16 @@
     body {
       font-family: 'Poppins', sans-serif;
       overflow: hidden;
+    }
+
+    /* Glassmorphic style */
+    .glass {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 1rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
     }
 
     /* Ambient cloud background */
@@ -30,6 +40,23 @@
       opacity: 0;
       transition: opacity 1s ease;
     }
+
+    #ambientOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: linear-gradient(120deg, #1a1c22 0%, #2a2f38 50%, #3d3f50 100%);
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      pointer-events: none;
+    }
+
+body.dark-mode #ambientOverlay {
+  opacity: 1;
+}
 
     .clouds {
       position: absolute;
@@ -69,7 +96,51 @@
       }
     }
 
-    /* Cloud Variants */
+/* DARK MODE THEME */
+body.dark-mode {
+  background: linear-gradient(120deg, #1a1c22, #2a2f38);
+  color: #f1f5f9;
+}
+
+body.dark-mode .glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .text-gray-800,
+body.dark-mode .text-gray-700,
+body.dark-mode .text-gray-600,
+body.dark-mode .text-gray-500 {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .bg-white {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.dark-mode #toggleDarkMode {
+  background-color: #2f2f2f;
+  color: #e2e8f0;
+}
+
+body.dark-mode #toggleDarkMode:hover {
+  background-color: #3b3b3b;
+}
+
+/* 🔥 New: Ambient background gradient in dark mode */
+body.dark-mode #ambientBackground {
+  background: linear-gradient(120deg, #1a1c22 0%, #2a2f38 50%, #3d3f50 100%);
+}
+
     .cloud1 { width: 120px; height: 60px; top: 20%; left: 10%; animation-duration: 18s, 6s; }
     .cloud2 { width: 150px; height: 75px; top: 50%; left: 20%; animation-duration: 22s, 5s; }
     .cloud3 { width: 100px; height: 50px; top: 70%; left: 30%; animation-duration: 15s, 8s; }
@@ -80,7 +151,32 @@
     .cloud8 { width: 190px; height: 95px; top: 65%; left: 40%; animation-duration: 26s, 7s; }
     .cloud9 { width: 130px; height: 65px; top: 45%; left: 85%; animation-duration: 18s, 6s; }
 
-    /* Design tip fade-in */
+    <!-- Ambient background for break mode -->
+<div id="ambientBackground">
+  <div id="ambientOverlay"></div>
+  <div class="clouds">
+    <!-- your cloud divs here -->
+  </div>
+</div>
+
+    /* Smooth fade between light/dark ambient backgrounds */
+    #ambientBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0;
+  background: linear-gradient(120deg, #a0e9ff 0%, #c4c1ff 50%, #f5e6ff 100%);
+  transition: background 2.4s ease-in-out, opacity 1.6s ease-in-out;
+}
+
+    body.dark-mode #ambientBackground {
+  background: linear-gradient(120deg, #1a1c22 0%, #2a2f38 50%, #3d3f50 100%);
+  opacity: 1;
+  }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -95,6 +191,15 @@
         padding: 1rem;
       }
     }
+
+    body,
+  .glass,
+  #challengeDisplay,
+  #ambientBackground {
+    transition: background 0.6s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+</style>
+
   </style>
 </head>
 
@@ -115,54 +220,64 @@
     </div>
   </div>
 
-  <div class="w-full max-w-4xl text-center">
+  <div class="w-full max-w-4xl text-center px-4">
     <h1 class="text-4xl font-semibold mb-8 tracking-wider leading-tight text-gray-800">
       Design Break Timer
     </h1>
 
-    <div class="flex justify-center space-x-16 mb-12">
-      <!-- Work Timer -->
-      <div class="text-center">
-        <div class="text-lg font-semibold text-gray-600">Work Timer</div>
-        <div id="timerDisplay" class="text-4xl font-bold mb-4">25:00</div>
-        <button id="startWorkButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Work Timer</button>
+    <button
+  id="toggleDarkMode"
+  class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 px-4 py-1 rounded-full text-sm shadow hover:bg-gray-300 transition z-50"
+>
+  🌙 Toggle Dark Mode
+</button>
+
+    <!-- Glass container for timers -->
+    <div class="glass p-8 rounded-2xl mb-10">
+      <div class="flex justify-center space-x-16 mb-12">
+        <!-- Work Timer -->
+        <div class="text-center">
+          <div class="text-lg font-semibold text-gray-600">Work Timer</div>
+          <div id="timerDisplay" class="text-4xl font-bold mb-4">25:00</div>
+          <button id="startWorkButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Work Timer</button>
+        </div>
+
+        <!-- Break Timer -->
+        <div class="text-center">
+          <div class="text-lg font-semibold text-gray-600">Break Timer</div>
+          <div id="breakTimerDisplay" class="text-4xl font-bold mb-4">5:00</div>
+          <button id="startBreakButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Break Timer</button>
+        </div>
       </div>
 
-      <!-- Break Timer -->
-      <div class="text-center">
-        <div class="text-lg font-semibold text-gray-600">Break Timer</div>
-        <div id="breakTimerDisplay" class="text-4xl font-bold mb-4">5:00</div>
-        <button id="startBreakButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Break Timer</button>
+      <!-- Timer length selection -->
+      <div class="mb-10">
+        <h3 class="text-sm text-gray-700">Select Work Timer Length:</h3>
+        <div class="flex justify-center flex-wrap gap-3 mt-2">
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="1">1 min</button>
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="5">5 min</button>
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="10">10 min</button>
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="15">15 min</button>
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="20">20 min</button>
+          <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="25">25 min</button>
+        </div>
       </div>
+
+      <div class="mb-4">
+        <h3 class="text-sm text-gray-700">Select Break Timer Length:</h3>
+        <div class="flex justify-center flex-wrap gap-3 mt-2">
+          <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="1">1 min</button>
+          <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="2">2 min</button>
+          <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="5">5 min</button>
+          <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="10">10 min</button>
+        </div>
+      </div>
+
+      <button id="resetButton" class="bg-red-500 text-white py-4 px-8 rounded-full w-1/2 mx-auto mb-4">Reset</button>
     </div>
 
-    <!-- Timer length selection -->
-    <div class="mb-10">
-      <h3 class="text-sm text-gray-700">Select Work Timer Length:</h3>
-      <div class="flex justify-center flex-wrap gap-3 mt-2">
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="1">1 min</button>
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="5">5 min</button>
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="10">10 min</button>
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="15">15 min</button>
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="20">20 min</button>
-        <button class="timer-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="25">25 min</button>
-      </div>
-    </div>
-
-    <div class="mb-4">
-      <h3 class="text-sm text-gray-700">Select Break Timer Length:</h3>
-      <div class="flex justify-center flex-wrap gap-3 mt-2">
-        <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="1">1 min</button>
-        <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="2">2 min</button>
-        <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="5">5 min</button>
-        <button class="break-button bg-blue-500 text-white py-2 px-4 rounded-full" data-time="10">10 min</button>
-      </div>
-    </div>
-
-    <button id="resetButton" class="bg-red-500 text-white py-4 px-8 rounded-full w-1/2 mx-auto mb-4">Reset</button>
-
-    <!-- Design tip -->
-    <div id="challengeDisplay" class="mt-10 text-lg text-gray-700 border border-gray-300 rounded-lg p-6 shadow-lg bg-white">
+    <!-- Design tip glass container -->
+    <div id="challengeDisplay" class="glass mt-10 text-lg text-gray-700 border border-gray-300 rounded-lg p-6 shadow-lg bg-white">
       <div class="bg-gray-100 text-sm text-gray-600 font-semibold px-4 py-1 rounded-t-lg inline-block">
         Quick Design Tip!
       </div>
