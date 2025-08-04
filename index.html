@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Productivity Timer with Design Breaks</title>
 
-  <!-- Tailwind CSS v2.0.3 -->
+  <!-- External Dependencies -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet"/>
 
   <style>
+    /* Base Styles */
     body {
       font-family: 'Poppins', sans-serif;
       overflow: hidden;
     }
 
-    /* Glassmorphic style */
+    /* Glassmorphic Components */
     .glass {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 1rem;
@@ -27,7 +28,7 @@
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
     }
 
-    /* Ambient cloud background */
+    /* Ambient Background System */
     #ambientBackground {
       position: fixed;
       top: 0;
@@ -54,10 +55,7 @@
       pointer-events: none;
     }
 
-body.dark-mode #ambientOverlay {
-  opacity: 1;
-}
-
+    /* Cloud Animation System */
     .clouds {
       position: absolute;
       top: 0;
@@ -75,72 +73,19 @@ body.dark-mode #ambientOverlay {
       animation: moveClouds linear infinite, floatClouds ease-in-out infinite;
     }
 
+    /* Cloud Keyframes */
     @keyframes moveClouds {
-      0% {
-        transform: translateX(-150%) scale(1);
-      }
-      100% {
-        transform: translateX(150%) scale(1.1);
-      }
+      0% { transform: translateX(-150%) scale(1); }
+      100% { transform: translateX(150%) scale(1.1); }
     }
 
     @keyframes floatClouds {
-      0% {
-        transform: translateY(0) scale(1);
-      }
-      50% {
-        transform: translateY(-10px) scale(1.05);
-      }
-      100% {
-        transform: translateY(0) scale(1);
-      }
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.05); }
+      100% { transform: translateY(0) scale(1); }
     }
 
-/* DARK MODE THEME */
-body.dark-mode {
-  background: linear-gradient(120deg, #1a1c22, #2a2f38);
-  color: #f1f5f9;
-}
-
-body.dark-mode .glass {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .text-gray-800,
-body.dark-mode .text-gray-700,
-body.dark-mode .text-gray-600,
-body.dark-mode .text-gray-500 {
-  color: #f1f5f9 !important;
-}
-
-body.dark-mode .bg-white {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-body.dark-mode .bg-gray-100 {
-  background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-body.dark-mode .border-gray-300 {
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-body.dark-mode #toggleDarkMode {
-  background-color: #2f2f2f;
-  color: #e2e8f0;
-}
-
-body.dark-mode #toggleDarkMode:hover {
-  background-color: #3b3b3b;
-}
-
-/* 🔥 New: Ambient background gradient in dark mode */
-body.dark-mode #ambientBackground {
-  background: linear-gradient(120deg, #1a1c22 0%, #2a2f38 50%, #3d3f50 100%);
-}
-
+    /* Individual Cloud Configurations */
     .cloud1 { width: 120px; height: 60px; top: 20%; left: 10%; animation-duration: 18s, 6s; }
     .cloud2 { width: 150px; height: 75px; top: 50%; left: 20%; animation-duration: 22s, 5s; }
     .cloud3 { width: 100px; height: 50px; top: 70%; left: 30%; animation-duration: 15s, 8s; }
@@ -151,6 +96,55 @@ body.dark-mode #ambientBackground {
     .cloud8 { width: 190px; height: 95px; top: 65%; left: 40%; animation-duration: 26s, 7s; }
     .cloud9 { width: 130px; height: 65px; top: 45%; left: 85%; animation-duration: 18s, 6s; }
 
+    /* Dark Mode Theme */
+    body.dark-mode {
+      background: linear-gradient(120deg, #1a1c22, #2a2f38);
+      color: #f1f5f9;
+    }
+
+    body.dark-mode .glass {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .text-gray-800,
+    body.dark-mode .text-gray-700,
+    body.dark-mode .text-gray-600,
+    body.dark-mode .text-gray-500 {
+      color: #f1f5f9 !important;
+    }
+
+    body.dark-mode .bg-white {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    body.dark-mode .bg-gray-100 {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    body.dark-mode .border-gray-300 {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    body.dark-mode #toggleDarkMode {
+      background-color: #2f2f2f;
+      color: #e2e8f0;
+    }
+
+    body.dark-mode #toggleDarkMode:hover {
+      background-color: #3b3b3b;
+    }
+
+    body.dark-mode #ambientBackground {
+      background: linear-gradient(120deg, #1a1c22 0%, #2a2f38 50%, #3d3f50 100%);
+    }
+
+    body.dark-mode #ambientOverlay {
+      opacity: 1;
+    }
+
+    /* UI Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -160,12 +154,14 @@ body.dark-mode #ambientBackground {
       animation: fadeIn 1s ease-in-out;
     }
 
+    /* Responsive Design */
     @media (max-width: 640px) {
       #challengeDisplay {
         padding: 1rem;
       }
     }
 
+    /* Smooth Transitions */
     body,
     .glass,
     #challengeDisplay,
@@ -176,8 +172,7 @@ body.dark-mode #ambientBackground {
 </head>
 
 <body class="bg-white text-gray-800 flex items-center justify-center h-screen">
-
-  <!-- Ambient background for break mode -->
+  <!-- Ambient Background for Break Mode -->
   <div id="ambientBackground">
     <div class="clouds">
       <div class="cloud cloud1"></div>
@@ -192,37 +187,45 @@ body.dark-mode #ambientBackground {
     </div>
   </div>
 
+  <!-- Main Content Container -->
   <div class="w-full max-w-4xl text-center px-4">
+    <!-- Page Title -->
     <h1 class="text-4xl font-semibold mb-8 tracking-wider leading-tight text-gray-800">
       Design Break Timer
     </h1>
 
+    <!-- Dark Mode Toggle -->
     <button
-  id="toggleDarkMode"
-  class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 px-4 py-1 rounded-full text-sm shadow hover:bg-gray-300 transition z-50"
->
-  🌙 Toggle Dark Mode
-</button>
+      id="toggleDarkMode"
+      class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 px-4 py-1 rounded-full text-sm shadow hover:bg-gray-300 transition z-50"
+    >
+      <i class="fas fa-moon"></i> Dark Mode
+    </button>
 
-    <!-- Glass container for timers -->
+    <!-- Timer Controls Container -->
     <div class="glass p-8 rounded-2xl mb-10">
+      <!-- Timer Displays -->
       <div class="flex justify-center space-x-16 mb-12">
         <!-- Work Timer -->
         <div class="text-center">
           <div class="text-lg font-semibold text-gray-600">Work Timer</div>
           <div id="timerDisplay" class="text-4xl font-bold mb-4">25:00</div>
-          <button id="startWorkButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Work Timer</button>
+          <button id="startWorkButton" class="bg-green-500 text-white py-2 px-8 rounded-full">
+            Start Work Timer
+          </button>
         </div>
 
         <!-- Break Timer -->
         <div class="text-center">
           <div class="text-lg font-semibold text-gray-600">Break Timer</div>
           <div id="breakTimerDisplay" class="text-4xl font-bold mb-4">5:00</div>
-          <button id="startBreakButton" class="bg-green-500 text-white py-2 px-8 rounded-full">Start Break Timer</button>
+          <button id="startBreakButton" class="bg-green-500 text-white py-2 px-8 rounded-full">
+            Start Break Timer
+          </button>
         </div>
       </div>
 
-      <!-- Timer length selection -->
+      <!-- Work Timer Length Selection -->
       <div class="mb-10">
         <h3 class="text-sm text-gray-700">Select Work Timer Length:</h3>
         <div class="flex justify-center flex-wrap gap-3 mt-2">
@@ -235,6 +238,7 @@ body.dark-mode #ambientBackground {
         </div>
       </div>
 
+      <!-- Break Timer Length Selection -->
       <div class="mb-4">
         <h3 class="text-sm text-gray-700">Select Break Timer Length:</h3>
         <div class="flex justify-center flex-wrap gap-3 mt-2">
@@ -245,21 +249,29 @@ body.dark-mode #ambientBackground {
         </div>
       </div>
 
-      <button id="resetButton" class="bg-red-500 text-white py-4 px-8 rounded-full w-1/2 mx-auto mb-4">Reset</button>
+      <!-- Reset Button -->
+      <button id="resetButton" class="bg-red-500 text-white py-4 px-8 rounded-full w-1/2 mx-auto mb-4">
+        Reset
+      </button>
     </div>
 
-    <!-- Design tip glass container -->
+    <!-- Design Tip Display -->
     <div id="challengeDisplay" class="glass mt-10 text-lg text-gray-700 border border-gray-300 rounded-lg p-6 shadow-lg bg-white">
       <div class="bg-gray-100 text-sm text-gray-600 font-semibold px-4 py-1 rounded-t-lg inline-block">
         Quick Design Tip!
       </div>
-      <div class="mt-3 text-base font-medium text-gray-800">This will show a design tip...</div>
+      <div class="mt-3 text-base font-medium text-gray-800">
+        This will show a design tip...
+      </div>
     </div>
 
-    <div id="sessionCount" class="mt-4 text-sm text-gray-500">Sessions Completed: 0</div>
+    <!-- Session Counter -->
+    <div id="sessionCount" class="mt-4 text-sm text-gray-500">
+      Sessions Completed: 0
+    </div>
   </div>
 
-  <!-- Your JavaScript -->
+  <!-- JavaScript -->
   <script src="app.js"></script>
 </body>
 </html>
