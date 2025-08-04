@@ -3,10 +3,14 @@ document.addEventListener('DOMContentLoaded', function () {
     let workTime = 25 * 60;
     let breakTime = 5 * 60;
     let timer;
-    let isWork = true;
-    let isPaused = false;
     let selectedWorkTime = workTime;
     let selectedBreakTime = breakTime;
+    
+    // Centralized Timer State
+    let timerState = {
+        activeTimer: null, // 'work', 'break', or null
+        isRunning: false
+    };
 
     // DOM Element References
     const timerDisplay = document.getElementById("timerDisplay");
@@ -558,15 +562,53 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateButtonColor(button, newColorClass) {
         const colorClasses = [
             'bg-green-500', 'bg-blue-500', 'bg-orange-500', 
-            'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'
+            'bg-red-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-600'
         ];
         colorClasses.forEach(cls => button.classList.remove(cls));
         button.classList.add(newColorClass);
     }
 
     function updateButton(button, { text = '', colorClass = '' }) {
-        if (text) button.textContent = text;
+        if (text) button.innerHTML = text;
         if (colorClass) updateButtonColor(button, colorClass);
+    }
+
+    // Unified Button State Management
+    function updateButtonStates() {
+        if (timerState.activeTimer === 'work' && timerState.isRunning) {
+            // Work timer is running - work button shows "Pause" (orange), break button shows "Start" (green)
+            updateButton(startWorkButton, {
+                text: '<i class="fas fa-pause mr-2"></i>Pause',
+                colorClass: "bg-yellow-600"
+            });
+            updateButton(startBreakButton, {
+                text: '<i class="fas fa-play mr-2"></i>Start',
+                colorClass: "bg-green-500"
+            });
+            startBreakButton.disabled = false;
+        } else if (timerState.activeTimer === 'break' && timerState.isRunning) {
+            // Break timer is running - break button shows "Pause" (orange), work button shows "Start" (green)
+            updateButton(startBreakButton, {
+                text: '<i class="fas fa-pause mr-2"></i>Pause',
+                colorClass: "bg-yellow-600"
+            });
+            updateButton(startWorkButton, {
+                text: '<i class="fas fa-play mr-2"></i>Start',
+                colorClass: "bg-green-500"
+            });
+            startBreakButton.disabled = false;
+        } else {
+            // No timer running - both buttons show "Start" (green)
+            updateButton(startWorkButton, {
+                text: '<i class="fas fa-play mr-2"></i>Start',
+                colorClass: "bg-green-500"
+            });
+            updateButton(startBreakButton, {
+                text: '<i class="fas fa-play mr-2"></i>Start',
+                colorClass: "bg-green-500"
+            });
+            startBreakButton.disabled = timerState.activeTimer === null;
+        }
     }
 
     function updateTimerDisplay(time, type) {
@@ -591,24 +633,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Timer Control Functions
+    // New Timer Control Functions with Mutual Exclusivity
+    function stopCurrentTimer() {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+        timerState.isRunning = false;
+        ambientBackground.style.opacity = 0;
+    }
+
     function startTimer(type) {
+        // Stop any currently running timer first
+        stopCurrentTimer();
+        
+        // Set new timer state
+        timerState.activeTimer = type;
+        timerState.isRunning = true;
+        
+        // Play start sound
+        playStartSound();
+        
         if (type === 'work') {
-            // Play start sound when work timer begins
-            playStartSound();
-            
-            updateButton(startWorkButton, {
-                text: "Pause",
-                colorClass: "bg-yellow-600"
-            });
-
-            updateButton(startBreakButton, {
-                text: "Start",
-                colorClass: "bg-green-500"
-            });
-
-            isWork = true;
-
             timer = setInterval(() => {
                 if (workTime > 0) {
                     workTime--;
@@ -616,32 +662,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     clearInterval(timer);
                     timer = null;
+                    timerState.isRunning = false;
+                    
                     // Play completion sound when work timer finishes
                     playCompletionSound();
                     // Celebrate work completion with fireworks and animations
                     celebrateWorkCompletion();
-                    startBreak();
+                    
+                    // Reset work timer to original value before starting break
+                    workTime = selectedWorkTime;
+                    updateTimerDisplay(workTime, 'work');
+                    
+                    // Start break timer after a brief delay to allow animations to complete
+                    setTimeout(() => {
+                        startBreak();
+                    }, 500);
                 }
             }, 1000);
-
-            startBreakButton.disabled = false;
+            
             updateOpacity('work');
             ambientBackground.style.opacity = 0;
-
+            
         } else if (type === 'break') {
-            updateButton(startBreakButton, {
-                text: "Pause",
-                colorClass: "bg-yellow-600"
-            });
-
-            updateButton(startWorkButton, {
-                text: "Start",
-                colorClass: "bg-green-500"
-            });
-
-            isWork = false;
             updateDesignTip();
-
+            
             timer = setInterval(() => {
                 if (breakTime > 0) {
                     breakTime--;
@@ -649,68 +693,59 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     clearInterval(timer);
                     timer = null;
+                    timerState.isRunning = false;
+                    
                     // Celebrate break completion with animations
                     celebrateBreakCompletion();
-                    startTimer('work');
+                    
+                    // Reset break timer to original value before starting work
+                    breakTime = selectedBreakTime;
+                    updateTimerDisplay(breakTime, 'break');
+                    
+                    // Start work timer after a brief delay to allow animations to complete
+                    setTimeout(() => {
+                        timerState.activeTimer = 'work';
+                        timerState.isRunning = true;
+                        startTimer('work');
+                    }, 500);
                 }
             }, 1000);
-
+            
             updateOpacity('break');
             ambientBackground.style.opacity = 1;
         }
-
-        isPaused = false;
+        
+        // Update button states
+        updateButtonStates();
     }
 
-    function stopTimer(type) {
-        clearInterval(timer);
-        timer = null;
-        
-        if (type === 'work') {
-            updateButton(startWorkButton, {
-                text: "Start",
-                colorClass: "bg-green-500"
-            });
-        } else if (type === 'break') {
-            updateButton(startBreakButton, {
-                text: "Start",
-                colorClass: "bg-green-500"
-            });
-        }
-        
-        isPaused = true;
-        ambientBackground.style.opacity = 0;
+    function pauseTimer() {
+        stopCurrentTimer();
+        updateButtonStates();
     }
 
     function startBreak() {
-        updateDesignTip();
-        startBreakButton.disabled = false;
         startTimer('break');
     }
 
     function resetTimers() {
+        stopCurrentTimer();
+        
+        // Reset timer values
         workTime = selectedWorkTime;
         breakTime = selectedBreakTime;
-        clearInterval(timer);
-        timer = null;
         
+        // Reset state
+        timerState.activeTimer = null;
+        timerState.isRunning = false;
+        
+        // Update displays
         updateTimerDisplay(workTime, 'work');
         updateTimerDisplay(breakTime, 'break');
-
-        updateButton(startWorkButton, {
-            text: "Start",
-            colorClass: "bg-green-500"
-        });
-        updateButton(startBreakButton, {
-            text: "Start",
-            colorClass: "bg-green-500"
-        });
-
-        startBreakButton.disabled = true;
-        isPaused = false;
-        isWork = true;
         updateOpacity('work');
-        ambientBackground.style.opacity = 0;
+        
+        // Update button states
+        updateButtonStates();
     }
 
     // Event Listeners Setup
@@ -737,19 +772,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Start/Pause Work Timer
         startWorkButton.addEventListener("click", function () {
-            if (isPaused || !timer) {
-                startTimer('work');
+            if (timerState.activeTimer === 'work' && timerState.isRunning) {
+                // Work timer is running, pause it
+                pauseTimer();
             } else {
-                stopTimer('work');
+                // Start work timer (this will stop any other running timer)
+                startTimer('work');
             }
         });
 
         // Start/Pause Break Timer
         startBreakButton.addEventListener("click", function () {
-            if (isPaused || !timer) {
-                startTimer('break');
+            if (timerState.activeTimer === 'break' && timerState.isRunning) {
+                // Break timer is running, pause it
+                pauseTimer();
             } else {
-                stopTimer('break');
+                // Start break timer (this will stop any other running timer)
+                startTimer('break');
             }
         });
 
@@ -778,20 +817,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize Application
     function initializeApp() {
+        // Initialize timer displays
         updateTimerDisplay(workTime, 'work');
         updateTimerDisplay(breakTime, 'break');
         
-        updateButton(startWorkButton, {
-            text: "Start",
-            colorClass: "bg-green-500"
-        });
-        updateButton(startBreakButton, {
-            text: "Start",
-            colorClass: "bg-green-500"
-        });
+        // Initialize timer state
+        timerState.activeTimer = null;
+        timerState.isRunning = false;
         
-        startBreakButton.disabled = true;
-        updateDarkModeButton(); // Initialize dark mode button text and icon
+        // Initialize UI
+        updateOpacity('work');
+        updateButtonStates();
+        updateDarkModeButton();
+        
+        // Setup event listeners
         setupEventListeners();
     }
 
