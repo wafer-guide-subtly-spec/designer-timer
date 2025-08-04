@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Productivity Timer with Design Breaks</title>
+  <title>Design-odoro</title>
 
   <!-- External Dependencies -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet" />
@@ -261,10 +261,89 @@
     .celebration-flash {
       animation: celebration-flash 0.3s ease-in-out 3;
     }
+
+    /* Button Focus Fix */
+    button {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus {
+      outline: none !important;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    /* Ensure color classes work properly */
+    .bg-green-500 {
+      background-color: #10b981 !important;
+    }
+
+    .bg-green-500:hover {
+      background-color: #059669 !important;
+    }
+
+    .bg-blue-500 {
+      background-color: #3b82f6 !important;
+    }
+
+    .bg-blue-500:hover {
+      background-color: #2563eb !important;
+    }
+
+    .bg-orange-500 {
+      background-color: #f97316 !important;
+    }
+
+    .bg-orange-500:hover {
+      background-color: #ea580c !important;
+    }
+
+    .bg-red-500 {
+      background-color: #ef4444 !important;
+    }
+
+    .bg-red-500:hover {
+      background-color: #dc2626 !important;
+    }
+
+    .bg-yellow-500 {
+      background-color: #eab308 !important;
+    }
+
+    .bg-yellow-500:hover {
+      background-color: #ca8a04 !important;
+    }
+
+    .bg-yellow-600 {
+      background-color: #d97706 !important;
+    }
+
+    .bg-yellow-600:hover {
+      background-color: #b45309 !important;
+    }
+
+    .bg-purple-500 {
+      background-color: #a855f7 !important;
+    }
+
+    .bg-purple-500:hover {
+      background-color: #9333ea !important;
+    }
+
+    .bg-pink-500 {
+      background-color: #ec4899 !important;
+    }
+
+    .bg-pink-500:hover {
+      background-color: #db2777 !important;
+    }
   </style>
 </head>
 
-<body class="bg-white text-gray-800 flex items-center justify-center h-screen">
+<body class="bg-white text-gray-800 min-h-screen py-8">
   <!-- Fireworks Container -->
   <div id="fireworksContainer"></div>
   
@@ -284,10 +363,10 @@
   </div>
 
   <!-- Main Content Container -->
-  <div class="w-full max-w-4xl text-center px-4 pb-20">
+  <div class="w-full max-w-4xl text-center px-4 pb-20 mx-auto">
     <!-- Page Title -->
     <h1 class="text-4xl font-semibold mb-8 tracking-wider leading-tight text-gray-800">
-      Design Break Timer
+      Design-odoro
     </h1>
 
     <!-- Settings and Dark Mode Controls -->
@@ -313,22 +392,22 @@
     <!-- Timer Controls Container -->
     <div class="glass p-8 rounded-2xl mb-10 relative">
       <!-- Timer Displays -->
-      <div class="flex justify-center space-x-16 mb-12">
+      <div class="relative mb-12 h-48">
         <!-- Work Timer -->
-        <div class="text-center">
-          <div class="text-lg font-semibold text-gray-600">Work Timer</div>
-          <div id="timerDisplay" class="text-7xl font-medium mb-6">25:00</div>
+        <div class="absolute left-1/2 transform -translate-x-full text-center">
+          <div class="text-lg font-semibold text-gray-600 mb-4">Work Timer</div>
+          <div id="timerDisplay" class="text-7xl font-medium mb-6 w-64 mx-auto font-mono">25:00</div>
           <button id="startWorkButton" class="bg-green-500 hover:bg-green-600 text-white py-2 px-8 rounded-full transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105">
-            Start Work Timer
+            <i class="fas fa-play mr-2"></i>Start
           </button>
         </div>
 
         <!-- Break Timer -->
-        <div class="text-center">
-          <div class="text-lg font-semibold text-gray-600">Break Timer</div>
-          <div id="breakTimerDisplay" class="text-7xl font-medium mb-6">5:00</div>
+        <div class="absolute left-1/2 transform translate-x-0 text-center">
+          <div class="text-lg font-semibold text-gray-600 mb-4">Break Timer</div>
+          <div id="breakTimerDisplay" class="text-7xl font-medium mb-6 w-64 mx-auto font-mono">5:00</div>
           <button id="startBreakButton" class="bg-green-500 hover:bg-green-600 text-white py-2 px-8 rounded-full transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105">
-            Start Break Timer
+            <i class="fas fa-play mr-2"></i>Start
           </button>
         </div>
       </div>
