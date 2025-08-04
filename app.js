@@ -169,7 +169,17 @@ document.addEventListener('DOMContentLoaded', function () {
         isPaused = false;
     }
     
+    const toggleButton = document.getElementById("toggleDarkMode");
+    toggleButton.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
     
+      // Small delay to match CSS transition for smooth UX
+      setTimeout(() => {
+        toggleButton.textContent = document.body.classList.contains("dark-mode")
+          ? "☀️ Light Mode"
+          : "🌙 Dark Mode";
+      }, 150);
+    });
 
     function stopTimer(type) {
         clearInterval(timer);
