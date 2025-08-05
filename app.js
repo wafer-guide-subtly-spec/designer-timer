@@ -1321,122 +1321,50 @@ document.addEventListener('DOMContentLoaded', function () {
     // Theme Management System
     let currentTheme = localStorage.getItem('designOdoroTheme') || 'office';
     
-    const themes = {
-        office: {
-            name: 'Office',
-            icon: 'fas fa-building',
-            class: ''
-        },
-        dark: {
-            name: 'Dark Mode',
-            icon: 'fas fa-moon',
-            class: 'dark-mode'
-        },
-        retro: {
-            name: 'Retro Computing',
-            icon: 'fas fa-terminal',
-            class: 'retro-theme'
-        }
-    };
-
-    function setTheme(themeKey) {
-        const theme = themes[themeKey];
-        if (!theme) return;
-
-        // Remove all theme classes
-        Object.values(themes).forEach(t => {
-            if (t.class) document.body.classList.remove(t.class);
-        });
-
-        // Apply new theme
-        if (theme.class) {
-            document.body.classList.add(theme.class);
-            currentTheme = theme.class;
+    function toggleTheme() {
+        // Toggle between office and retro themes only
+        if (currentTheme === 'office') {
+            // Switch to retro theme
+            document.body.classList.add('retro-theme');
+            currentTheme = 'retro-theme';
         } else {
+            // Switch back to office theme
+            document.body.classList.remove('retro-theme');
             currentTheme = 'office';
         }
-
+        
         // Save theme preference
         localStorage.setItem('designOdoroTheme', currentTheme);
         
-        // Update theme dropdown
-        updateThemeDropdown();
+        // Update button appearance
+        updateThemeButton();
     }
 
-    function updateThemeDropdown() {
-        const currentThemeLabel = document.getElementById('currentThemeLabel');
-        if (!currentThemeLabel) return;
+    function updateThemeButton() {
+        const themeButton = document.getElementById('themeToggleButton');
+        if (!themeButton) return;
 
-        const currentThemeObj = Object.values(themes).find(t => 
-            t.class === currentTheme || (currentTheme === 'office' && t.name === 'Office')
-        );
-
-        if (currentThemeObj) {
-            currentThemeLabel.textContent = currentThemeObj.name;
+        if (currentTheme === 'retro-theme') {
+            themeButton.innerHTML = '<i class="fas fa-terminal"></i> Retro';
+            themeButton.title = 'Switch to Office Theme';
+        } else {
+            themeButton.innerHTML = '<i class="fas fa-building"></i> Office';
+            themeButton.title = 'Switch to Retro Theme';
         }
     }
 
-    function initializeThemeDropdown() {
-        const dropdownToggle = document.getElementById('themeDropdownToggle');
-        const dropdownMenu = document.getElementById('themeDropdownMenu');
-        const themeOptions = document.querySelectorAll('.theme-option');
-
-        console.log('Theme dropdown elements:', { 
-            dropdownToggle: !!dropdownToggle, 
-            dropdownMenu: !!dropdownMenu, 
-            themeOptions: themeOptions.length 
-        });
-
-        if (!dropdownToggle || !dropdownMenu) {
-            console.warn('Theme dropdown elements not found');
+    function initializeThemeToggle() {
+        const themeButton = document.getElementById('themeToggleButton');
+        
+        if (!themeButton) {
+            console.warn('Theme toggle button not found');
             return false;
         }
 
-        let isDropdownOpen = false;
-
-        // Toggle dropdown - work with existing CSS classes
-        dropdownToggle.addEventListener('click', (e) => {
-            console.log('Theme dropdown clicked, current state:', isDropdownOpen);
+        // Add click event listener
+        themeButton.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation();
-            
-            if (isDropdownOpen) {
-                // Close the dropdown
-                console.log('Closing theme dropdown');
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                isDropdownOpen = false;
-            } else {
-                // Open the dropdown
-                console.log('Opening theme dropdown');
-                dropdownMenu.classList.remove('opacity-0', 'invisible');
-                isDropdownOpen = true;
-            }
-            
-            console.log('New state:', isDropdownOpen);
-        });
-
-        // Handle theme selection
-        themeOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                console.log('Theme option clicked:', option.dataset.theme);
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const selectedTheme = option.dataset.theme;
-                setTheme(selectedTheme);
-                
-                // Close dropdown
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                isDropdownOpen = false;
-            });
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                isDropdownOpen = false;
-            }
+            toggleTheme();
         });
 
         return true;
@@ -1444,24 +1372,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initializeTheme() {
         // Apply saved theme on startup
-        if (currentTheme && currentTheme !== 'office') {
-            document.body.classList.add(currentTheme);
+        if (currentTheme === 'retro-theme') {
+            document.body.classList.add('retro-theme');
         }
-        updateThemeDropdown();
         
-        // Initialize theme dropdown with retry mechanism
+        // Update button appearance
+        updateThemeButton();
+        
+        // Initialize theme toggle with retry mechanism
         let retryCount = 0;
         const maxRetries = 5;
         
         const tryInitTheme = () => {
-            if (initializeThemeDropdown()) {
-                console.log("Theme dropdown initialized successfully");
+            if (initializeThemeToggle()) {
+                console.log("Theme toggle initialized successfully");
             } else if (retryCount < maxRetries) {
                 retryCount++;
-                console.log(`Retrying theme dropdown initialization (${retryCount}/${maxRetries})`);
+                console.log(`Retrying theme toggle initialization (${retryCount}/${maxRetries})`);
                 setTimeout(tryInitTheme, 100);
             } else {
-                console.error("Failed to initialize theme dropdown after", maxRetries, "attempts");
+                console.error("Failed to initialize theme toggle after", maxRetries, "attempts");
             }
         };
         
