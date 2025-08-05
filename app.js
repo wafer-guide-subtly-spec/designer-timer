@@ -1381,19 +1381,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const dropdownMenu = document.getElementById('themeDropdownMenu');
         const themeOptions = document.querySelectorAll('.theme-option');
 
-        if (!dropdownToggle || !dropdownMenu) return;
+        console.log('Theme dropdown elements:', { 
+            dropdownToggle: !!dropdownToggle, 
+            dropdownMenu: !!dropdownMenu, 
+            themeOptions: themeOptions.length 
+        });
+
+        if (!dropdownToggle || !dropdownMenu) {
+            console.warn('Theme dropdown elements not found');
+            return false;
+        }
 
         let isDropdownOpen = false;
 
         // Toggle dropdown
         dropdownToggle.addEventListener('click', (e) => {
+            console.log('Theme dropdown clicked');
             e.preventDefault();
             e.stopPropagation();
             
             if (isDropdownOpen) {
+                console.log('Closing theme dropdown');
                 dropdownMenu.classList.add('opacity-0', 'invisible');
+                dropdownMenu.style.display = 'none';
                 isDropdownOpen = false;
             } else {
+                console.log('Opening theme dropdown');
+                dropdownMenu.style.display = 'block';
                 dropdownMenu.classList.remove('opacity-0', 'invisible');
                 isDropdownOpen = true;
             }
@@ -1402,6 +1416,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Handle theme selection
         themeOptions.forEach(option => {
             option.addEventListener('click', (e) => {
+                console.log('Theme option clicked:', option.dataset.theme);
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -1410,6 +1425,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // Close dropdown
                 dropdownMenu.classList.add('opacity-0', 'invisible');
+                dropdownMenu.style.display = 'none';
                 isDropdownOpen = false;
             });
         });
@@ -1418,9 +1434,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', (e) => {
             if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
                 dropdownMenu.classList.add('opacity-0', 'invisible');
+                dropdownMenu.style.display = 'none';
                 isDropdownOpen = false;
             }
         });
+
+        return true;
     }
 
     function initializeTheme() {
@@ -1429,7 +1448,24 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.add(currentTheme);
         }
         updateThemeDropdown();
-        initializeThemeDropdown();
+        
+        // Initialize theme dropdown with retry mechanism
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        const tryInitTheme = () => {
+            if (initializeThemeDropdown()) {
+                console.log("Theme dropdown initialized successfully");
+            } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Retrying theme dropdown initialization (${retryCount}/${maxRetries})`);
+                setTimeout(tryInitTheme, 100);
+            } else {
+                console.error("Failed to initialize theme dropdown after", maxRetries, "attempts");
+            }
+        };
+        
+        tryInitTheme();
     }
 
     // Start the application with GitHub Pages compatibility
