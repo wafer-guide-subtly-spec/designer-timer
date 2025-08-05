@@ -1327,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Theme Management System
-    let currentTheme = localStorage.getItem('designOdoroTheme') || 'office';
+    let currentTheme = localStorage.getItem('designOdoroTheme') || 'retro-theme';
     
     function toggleTheme() {
         // Toggle between office and retro themes only
