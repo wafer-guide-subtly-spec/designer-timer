@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
 
   <style>
     /* Base Styles */
@@ -127,13 +128,15 @@
     }
 
     body.dark-mode #toggleDarkMode,
-    body.dark-mode button[onclick="showApiKeySettings()"] {
+    body.dark-mode button[onclick="showApiKeySettings()"],
+    body.dark-mode #themeDropdownToggle {
       background-color: #2f2f2f;
       color: #e2e8f0;
     }
 
     body.dark-mode #toggleDarkMode:hover,
-    body.dark-mode button[onclick="showApiKeySettings()"]:hover {
+    body.dark-mode button[onclick="showApiKeySettings()"]:hover,
+    body.dark-mode #themeDropdownToggle:hover {
       background-color: #3b3b3b;
     }
 
@@ -185,32 +188,32 @@
     /* Timer Completion Animations */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-      20%, 40%, 60%, 80% { transform: translateX(10px); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+      20%, 40%, 60%, 80% { transform: translateX(3px); }
     }
 
     @keyframes buzz {
       0%, 100% { transform: scale(1) rotate(0deg); }
-      25% { transform: scale(1.05) rotate(1deg); }
-      50% { transform: scale(1.1) rotate(-1deg); }
-      75% { transform: scale(1.05) rotate(1deg); }
+      25% { transform: scale(1.02) rotate(0.5deg); }
+      50% { transform: scale(1.03) rotate(-0.5deg); }
+      75% { transform: scale(1.02) rotate(0.5deg); }
     }
 
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.7; }
+      50% { transform: scale(1.05); opacity: 0.9; }
     }
 
     .shake-animation {
-      animation: shake 0.8s ease-in-out 3;
+      animation: shake 0.6s ease-in-out 2;
     }
 
     .buzz-animation {
-      animation: buzz 0.5s ease-in-out 4;
+      animation: buzz 0.4s ease-in-out 2;
     }
 
     .pulse-animation {
-      animation: pulse 1s ease-in-out 3;
+      animation: pulse 0.8s ease-in-out 2;
     }
 
     /* Fireworks Container */
@@ -340,6 +343,176 @@
     .bg-pink-500:hover {
       background-color: #db2777 !important;
     }
+
+    /* Retro Computing Theme */
+    body.retro-theme {
+      background: #000000;
+      color: #00ff00;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    body.retro-theme .glass {
+      background: rgba(0, 255, 0, 0.05);
+      border: 1px solid #00ff00;
+      border-radius: 0;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    body.retro-theme h1,
+    body.retro-theme .text-gray-800,
+    body.retro-theme .text-gray-700,
+    body.retro-theme .text-gray-600,
+    body.retro-theme .text-gray-500 {
+      color: #00ff00 !important;
+      text-shadow: 0 0 10px #00ff00;
+    }
+
+    body.retro-theme #timerDisplay,
+    body.retro-theme #breakTimerDisplay {
+      color: #00ff00;
+      text-shadow: 0 0 20px #00ff00;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    body.retro-theme button {
+      background: transparent !important;
+      border: 2px solid #00ff00 !important;
+      color: #00ff00 !important;
+      border-radius: 0 !important;
+      text-shadow: 0 0 5px #00ff00;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+
+    body.retro-theme button:hover {
+      background: rgba(0, 255, 0, 0.1) !important;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    }
+
+    body.retro-theme #challengeDisplay {
+      background: rgba(0, 255, 0, 0.05);
+      border: 1px solid #00ff00;
+      border-radius: 0;
+      color: #00ff00;
+    }
+
+    body.retro-theme #challengeDisplay .bg-gradient-to-r {
+      background: #00ff00 !important;
+      color: #000000 !important;
+    }
+
+    body.retro-theme #ambientBackground {
+      background: #000000;
+    }
+
+    body.retro-theme .clouds {
+      display: none;
+    }
+
+    /* CRT Scanlines Effect */
+    body.retro-theme::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.03) 2px,
+        rgba(0, 255, 0, 0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Terminal Cursor Animation */
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    body.retro-theme .cursor::after {
+      content: '_';
+      animation: blink 1s infinite;
+      color: #00ff00;
+    }
+
+    /* Retro Theme Dropdown and Settings Backgrounds */
+    body.retro-theme #themeDropdownMenu {
+      background: #000000 !important;
+      border: 1px solid #00ff00 !important;
+      border-radius: 0 !important;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3) !important;
+    }
+
+    body.retro-theme .theme-option {
+      color: #00ff00 !important;
+    }
+
+    body.retro-theme .theme-option:hover {
+      background: rgba(0, 255, 0, 0.1) !important;
+    }
+
+    body.retro-theme #settingsPanel .bg-gray-50 {
+      background: #000000 !important;
+      border: 1px solid #00ff00 !important;
+      border-radius: 0 !important;
+    }
+
+    body.retro-theme #settingsPanel h3 {
+      color: #00ff00 !important;
+    }
+
+    /* Retro Theme API Settings Modal */
+    body.retro-theme .glass {
+      background: #000000 !important;
+      border: 1px solid #00ff00 !important;
+      border-radius: 0 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3) !important;
+    }
+
+    /* Ensure modal background is solid black in retro theme */
+    body.retro-theme .fixed.inset-0 .glass {
+      background: #000000 !important;
+    }
+
+    body.retro-theme .glass h3,
+    body.retro-theme .glass p,
+    body.retro-theme .glass div {
+      color: #00ff00 !important;
+    }
+
+    body.retro-theme .glass input {
+      background: #000000 !important;
+      border: 1px solid #00ff00 !important;
+      color: #00ff00 !important;
+      border-radius: 0 !important;
+    }
+
+    body.retro-theme .glass input::placeholder {
+      color: #008800 !important;
+    }
+
+    body.retro-theme .glass button {
+      background: transparent !important;
+      border: 1px solid #00ff00 !important;
+      color: #00ff00 !important;
+      border-radius: 0 !important;
+    }
+
+    body.retro-theme .glass button:hover {
+      background: rgba(0, 255, 0, 0.1) !important;
+    }
+
+    body.retro-theme .glass a {
+      color: #00ff00 !important;
+    }
   </style>
 </head>
 
@@ -379,6 +552,34 @@
       >
         <i class="fas fa-cog"></i> API Settings
       </button>
+      
+      <!-- Theme Selector Dropdown -->
+      <div class="relative">
+        <button
+          id="themeDropdownToggle"
+          class="bg-gray-200 text-gray-800 px-4 py-1 rounded-full text-sm shadow hover:bg-gray-300 transition-all duration-200 hover:shadow-md transform hover:scale-105 flex items-center gap-2"
+          title="Select Theme"
+        >
+          <i class="fas fa-palette"></i>
+          <span id="currentThemeLabel">Office</span>
+          <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+        
+        <div id="themeDropdownMenu" class="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-40 z-10 opacity-0 invisible transition-all duration-200">
+          <button class="theme-option w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2" data-theme="office">
+            <i class="fas fa-building text-blue-500"></i>
+            <span>Office</span>
+          </button>
+          <button class="theme-option w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2" data-theme="dark">
+            <i class="fas fa-moon text-purple-500"></i>
+            <span>Dark Mode</span>
+          </button>
+          <button class="theme-option w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 flex items-center gap-2" data-theme="retro">
+            <i class="fas fa-terminal text-green-500"></i>
+            <span>Retro Computing</span>
+          </button>
+        </div>
+      </div>
       
       <!-- Dark Mode Toggle -->
       <button
