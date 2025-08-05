@@ -828,19 +828,34 @@ document.addEventListener('DOMContentLoaded', function () {
         const settingsPanel = document.getElementById("settingsPanel");
         const settingsChevron = document.getElementById("settingsChevron");
 
-        settingsToggle.addEventListener("click", () => {
-            const isOpen = settingsPanel.style.maxHeight !== "0px";
-            
-            if (isOpen) {
-                // Close the panel
-                settingsPanel.style.maxHeight = "0px";
-                settingsChevron.style.transform = "rotate(0deg)";
-            } else {
-                // Open the panel
-                settingsPanel.style.maxHeight = settingsPanel.scrollHeight + "px";
-                settingsChevron.style.transform = "rotate(180deg)";
-            }
-        });
+        if (settingsToggle && settingsPanel && settingsChevron) {
+            settingsToggle.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const currentMaxHeight = settingsPanel.style.maxHeight;
+                const isOpen = currentMaxHeight && currentMaxHeight !== "0px";
+                
+                if (isOpen) {
+                    // Close the panel
+                    settingsPanel.style.maxHeight = "0px";
+                    settingsChevron.style.transform = "rotate(0deg)";
+                } else {
+                    // Open the panel - calculate the actual content height
+                    settingsPanel.style.maxHeight = "none";
+                    const height = settingsPanel.scrollHeight;
+                    settingsPanel.style.maxHeight = "0px";
+                    
+                    // Force reflow then animate
+                    requestAnimationFrame(() => {
+                        settingsPanel.style.maxHeight = height + "px";
+                        settingsChevron.style.transform = "rotate(180deg)";
+                    });
+                }
+            });
+        } else {
+            console.warn("Settings dropdown elements not found");
+        }
     }
 
     // Dark Mode Button Update Function
