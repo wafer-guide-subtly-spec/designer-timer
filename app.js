@@ -35,6 +35,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Animation and Effects Functions
     function createFireworks() {
+        // Check if we're in retro theme
+        if (document.body.classList.contains('retro-theme')) {
+            createRetroCelebration();
+            return;
+        }
+        
         const container = document.getElementById('fireworksContainer');
         const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8'];
         
@@ -97,6 +103,126 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function createRetroCelebration() {
+        const container = document.getElementById('fireworksContainer');
+        
+        // Create digital rain effect
+        createDigitalRain(container);
+        
+        // Create ASCII art celebration
+        setTimeout(() => {
+            createASCIICelebration(container);
+        }, 500);
+    }
+
+    function createDigitalRain(container) {
+        const characters = ['0', '1', 'A', 'B', 'C', 'D', 'E', 'F', '@', '#', '$', '%', '&', '*', '+', '-', '=', '|', '\\', '/', '?', '<', '>'];
+        const columns = Math.floor(window.innerWidth / 20); // Character every 20px
+        
+        // Create multiple waves of rain for longer effect
+        for (let wave = 0; wave < 3; wave++) {
+            setTimeout(() => {
+                for (let col = 0; col < columns; col++) {
+                    const columnDelay = Math.random() * 800; // Stagger column starts
+                    
+                    setTimeout(() => {
+                        const charactersInColumn = 25 + Math.random() * 30; // 25-55 characters per column (increased)
+                        
+                        for (let i = 0; i < charactersInColumn; i++) {
+                            setTimeout(() => {
+                                const char = document.createElement('div');
+                                char.textContent = characters[Math.floor(Math.random() * characters.length)];
+                                char.style.position = 'absolute';
+                                char.style.left = (col * 20) + 'px';
+                                char.style.top = '-20px';
+                                char.style.color = '#00ff00';
+                                char.style.fontFamily = 'Courier Prime, Courier New, monospace';
+                                char.style.fontSize = '14px';
+                                char.style.textShadow = '0 0 5px #00ff00';
+                                char.style.pointerEvents = 'none';
+                                char.style.zIndex = '1001';
+                                
+                                // Animate falling
+                                const fallDuration = 2500 + Math.random() * 1500; // 2.5-4 seconds (increased)
+                                const fallDistance = window.innerHeight + 50;
+                                
+                                char.animate([
+                                    { transform: 'translateY(0px)', opacity: 1 },
+                                    { transform: `translateY(${fallDistance}px)`, opacity: 0 }
+                                ], {
+                                    duration: fallDuration,
+                                    easing: 'linear'
+                                }).onfinish = () => {
+                                    if (char.parentNode) {
+                                        char.parentNode.removeChild(char);
+                                    }
+                                };
+                                
+                                container.appendChild(char);
+                            }, i * 40); // Slightly faster stagger for more density
+                        }
+                    }, columnDelay);
+                }
+            }, wave * 1200); // Waves start 1.2 seconds apart
+        }
+    }
+
+    function createASCIICelebration(container) {
+        const asciiArt = [
+            '╔══════════════════════╗',
+            '║   WORK COMPLETE!     ║',
+            '║  ████████████████    ║',
+            '║  ██ SUCCESS! ██      ║',
+            '║  ████████████████    ║',
+            '╚══════════════════════╝'
+        ];
+        
+        const artContainer = document.createElement('div');
+        artContainer.style.position = 'absolute';
+        artContainer.style.left = '50%';
+        artContainer.style.top = '40%';
+        artContainer.style.transform = 'translate(-50%, -50%)';
+        artContainer.style.color = '#00ff00';
+        artContainer.style.fontFamily = 'Courier Prime, Courier New, monospace';
+        artContainer.style.fontSize = '16px';
+        artContainer.style.textShadow = '0 0 10px #00ff00';
+        artContainer.style.whiteSpace = 'pre';
+        artContainer.style.textAlign = 'center';
+        artContainer.style.pointerEvents = 'none';
+        artContainer.style.zIndex = '1002';
+        artContainer.style.lineHeight = '1.2';
+        
+        // Type out the ASCII art line by line
+        let currentLine = 0;
+        const typeInterval = setInterval(() => {
+            if (currentLine < asciiArt.length) {
+                artContainer.textContent += asciiArt[currentLine] + '\n';
+                currentLine++;
+            } else {
+                clearInterval(typeInterval);
+                
+                // Add pulsing glow effect
+                artContainer.animate([
+                    { textShadow: '0 0 10px #00ff00' },
+                    { textShadow: '0 0 20px #00ff00, 0 0 30px #00ff00' },
+                    { textShadow: '0 0 10px #00ff00' }
+                ], {
+                    duration: 1000,
+                    iterations: 3
+                });
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    if (artContainer.parentNode) {
+                        artContainer.parentNode.removeChild(artContainer);
+                    }
+                }, 3000);
+            }
+        }, 150); // Type each line every 150ms
+        
+        container.appendChild(artContainer);
+    }
+
     function addShakeAnimation(element) {
         element.classList.add('shake-animation');
         setTimeout(() => {
@@ -155,6 +281,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Sound Effect Functions
     function playStartSound() {
+        // Check if we're in retro theme
+        if (document.body.classList.contains('retro-theme')) {
+            playRetroStartSound();
+            return;
+        }
+        
         try {
             const ctx = initAudioContext();
             
@@ -183,6 +315,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function playCompletionSound() {
+        // Check if we're in retro theme
+        if (document.body.classList.contains('retro-theme')) {
+            playRetroCompletionSound();
+            return;
+        }
+        
         try {
             const ctx = initAudioContext();
             
@@ -205,6 +343,147 @@ document.addEventListener('DOMContentLoaded', function () {
             oscillator.type = 'sine';
             oscillator.start(ctx.currentTime);
             oscillator.stop(ctx.currentTime + 2);
+        } catch (error) {
+            console.log('Audio not supported or blocked');
+        }
+    }
+
+    function playRetroStartSound() {
+        try {
+            const ctx = initAudioContext();
+            
+            // Create modem startup sound - short handshake chirps
+            const duration = 0.8; // Keep it under 1 second
+            
+            // Create multiple oscillators for complex modem sound
+            const frequencies = [1200, 2400, 1800, 2100, 1650]; // Classic modem frequencies
+            const oscillators = [];
+            const gainNodes = [];
+            
+            frequencies.forEach((freq, index) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                // Use square wave for digital sound
+                osc.type = 'square';
+                
+                // Rapid frequency modulation for modem effect
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(freq * 1.1, ctx.currentTime + 0.1);
+                osc.frequency.linearRampToValueAtTime(freq * 0.9, ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + 0.3);
+                
+                // Staggered envelope for each tone
+                const startTime = ctx.currentTime + (index * 0.05);
+                const endTime = startTime + 0.15;
+                
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(0.1, startTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, endTime);
+                
+                osc.start(startTime);
+                osc.stop(endTime);
+                
+                oscillators.push(osc);
+                gainNodes.push(gain);
+            });
+            
+            // Add some digital noise for authenticity
+            const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+            const noiseData = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < noiseData.length; i++) {
+                noiseData[i] = (Math.random() * 2 - 1) * 0.05; // Low volume noise
+            }
+            
+            const noiseSource = ctx.createBufferSource();
+            const noiseGain = ctx.createGain();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+            
+            noiseGain.gain.setValueAtTime(0.3, ctx.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            
+            noiseSource.start(ctx.currentTime);
+            noiseSource.stop(ctx.currentTime + 0.1);
+            
+        } catch (error) {
+            console.log('Audio not supported or blocked');
+        }
+    }
+
+    function playRetroCompletionSound() {
+        try {
+            const ctx = initAudioContext();
+            
+            // Create quick arcade success sound - ascending tones
+            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 - classic arcade progression
+            const noteDuration = 0.15;
+            
+            notes.forEach((freq, index) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                // Square wave for retro arcade sound
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                
+                // Timing for each note
+                const startTime = ctx.currentTime + (index * noteDuration);
+                const endTime = startTime + noteDuration;
+                
+                // Quick attack and decay for punchy arcade sound
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(0.2, startTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, endTime);
+                
+                osc.start(startTime);
+                osc.stop(endTime);
+            });
+            
+        } catch (error) {
+            console.log('Audio not supported or blocked');
+        }
+    }
+
+    function playResetSound() {
+        // Check if we're in retro theme
+        if (document.body.classList.contains('retro-theme')) {
+            playRetroResetSound();
+        }
+        // No sound for other themes - keep reset silent for office/dark modes
+    }
+
+    function playRetroResetSound() {
+        try {
+            const ctx = initAudioContext();
+            
+            // Create low quick buzz sound
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            // Low frequency square wave for buzzy sound
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(120, ctx.currentTime); // Low buzz frequency
+            osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.2); // Slight downward sweep
+            
+            // Quick buzz envelope
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01); // Quick attack
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25); // Quick decay
+            
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.25); // Keep it short - 250ms
+            
         } catch (error) {
             console.log('Audio not supported or blocked');
         }
@@ -702,10 +981,10 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (type === 'work') {
             timer = setInterval(() => {
-                if (workTime > 0) {
-                    workTime--;
-                    updateTimerDisplay(workTime, 'work');
-                } else {
+                workTime--;
+                updateTimerDisplay(workTime, 'work');
+                
+                if (workTime <= 0) {
                     clearInterval(timer);
                     timer = null;
                     timerState.isRunning = false;
@@ -733,10 +1012,10 @@ document.addEventListener('DOMContentLoaded', function () {
             updateDesignTip();
             
             timer = setInterval(() => {
-                if (breakTime > 0) {
-                    breakTime--;
-                    updateTimerDisplay(breakTime, 'break');
-                } else {
+                breakTime--;
+                updateTimerDisplay(breakTime, 'break');
+                
+                if (breakTime <= 0) {
                     clearInterval(timer);
                     timer = null;
                     timerState.isRunning = false;
@@ -839,7 +1118,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Reset Button
-        resetButton.addEventListener("click", resetTimers);
+        resetButton.addEventListener("click", () => {
+            playResetSound();
+            resetTimers();
+        });
+
 
         // Dark Mode Toggle
         toggleButton.addEventListener("click", () => {
@@ -1035,6 +1318,120 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Theme Management System
+    let currentTheme = localStorage.getItem('designOdoroTheme') || 'office';
+    
+    const themes = {
+        office: {
+            name: 'Office',
+            icon: 'fas fa-building',
+            class: ''
+        },
+        dark: {
+            name: 'Dark Mode',
+            icon: 'fas fa-moon',
+            class: 'dark-mode'
+        },
+        retro: {
+            name: 'Retro Computing',
+            icon: 'fas fa-terminal',
+            class: 'retro-theme'
+        }
+    };
+
+    function setTheme(themeKey) {
+        const theme = themes[themeKey];
+        if (!theme) return;
+
+        // Remove all theme classes
+        Object.values(themes).forEach(t => {
+            if (t.class) document.body.classList.remove(t.class);
+        });
+
+        // Apply new theme
+        if (theme.class) {
+            document.body.classList.add(theme.class);
+            currentTheme = theme.class;
+        } else {
+            currentTheme = 'office';
+        }
+
+        // Save theme preference
+        localStorage.setItem('designOdoroTheme', currentTheme);
+        
+        // Update theme dropdown
+        updateThemeDropdown();
+    }
+
+    function updateThemeDropdown() {
+        const currentThemeLabel = document.getElementById('currentThemeLabel');
+        if (!currentThemeLabel) return;
+
+        const currentThemeObj = Object.values(themes).find(t => 
+            t.class === currentTheme || (currentTheme === 'office' && t.name === 'Office')
+        );
+
+        if (currentThemeObj) {
+            currentThemeLabel.textContent = currentThemeObj.name;
+        }
+    }
+
+    function initializeThemeDropdown() {
+        const dropdownToggle = document.getElementById('themeDropdownToggle');
+        const dropdownMenu = document.getElementById('themeDropdownMenu');
+        const themeOptions = document.querySelectorAll('.theme-option');
+
+        if (!dropdownToggle || !dropdownMenu) return;
+
+        let isDropdownOpen = false;
+
+        // Toggle dropdown
+        dropdownToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isDropdownOpen) {
+                dropdownMenu.classList.add('opacity-0', 'invisible');
+                isDropdownOpen = false;
+            } else {
+                dropdownMenu.classList.remove('opacity-0', 'invisible');
+                isDropdownOpen = true;
+            }
+        });
+
+        // Handle theme selection
+        themeOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const selectedTheme = option.dataset.theme;
+                setTheme(selectedTheme);
+                
+                // Close dropdown
+                dropdownMenu.classList.add('opacity-0', 'invisible');
+                isDropdownOpen = false;
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.add('opacity-0', 'invisible');
+                isDropdownOpen = false;
+            }
+        });
+    }
+
+    function initializeTheme() {
+        // Apply saved theme on startup
+        if (currentTheme && currentTheme !== 'office') {
+            document.body.classList.add(currentTheme);
+        }
+        updateThemeDropdown();
+        initializeThemeDropdown();
+    }
+
     // Start the application with GitHub Pages compatibility
     async function startApp() {
         // Wait for complete DOM and resource loading
@@ -1042,6 +1439,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Additional delay for GitHub Pages
         await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Initialize theme before app
+        initializeTheme();
         
         initializeApp();
     }
