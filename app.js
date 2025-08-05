@@ -1465,26 +1465,45 @@ document.addEventListener('DOMContentLoaded', function () {
         const timerDisplayElement = document.getElementById('timerDisplay');
         const breakTimerDisplayElement = document.getElementById('breakTimerDisplay');
         const fullscreenTimer = document.getElementById('fullscreenTimer');
+        const fullscreenDisplay = document.getElementById('fullscreenTimerDisplay');
+        const fullscreenHeader = document.getElementById('fullscreenTimerHeader');
         
-        if (!timerDisplayElement || !breakTimerDisplayElement || !fullscreenTimer) {
-            console.warn('Fullscreen timer elements not found');
+        console.log('Fullscreen timer elements:', { 
+            timerDisplayElement: !!timerDisplayElement, 
+            breakTimerDisplayElement: !!breakTimerDisplayElement,
+            fullscreenTimer: !!fullscreenTimer,
+            fullscreenDisplay: !!fullscreenDisplay,
+            fullscreenHeader: !!fullscreenHeader
+        });
+        
+        if (!timerDisplayElement || !breakTimerDisplayElement || !fullscreenTimer || !fullscreenDisplay || !fullscreenHeader) {
+            console.warn('Fullscreen timer elements not found - missing elements:', {
+                timerDisplayElement: !!timerDisplayElement,
+                breakTimerDisplayElement: !!breakTimerDisplayElement,
+                fullscreenTimer: !!fullscreenTimer,
+                fullscreenDisplay: !!fullscreenDisplay,
+                fullscreenHeader: !!fullscreenHeader
+            });
             return false;
         }
 
         // Add click listener to work timer display
         timerDisplayElement.addEventListener('click', (e) => {
+            console.log('Work timer clicked for fullscreen');
             e.preventDefault();
             toggleFullscreenTimer();
         });
 
         // Add click listener to break timer display
         breakTimerDisplayElement.addEventListener('click', (e) => {
+            console.log('Break timer clicked for fullscreen');
             e.preventDefault();
             toggleFullscreenTimer();
         });
 
         // Add click listener to fullscreen timer to exit
         fullscreenTimer.addEventListener('click', (e) => {
+            console.log('Fullscreen timer clicked to exit');
             e.preventDefault();
             toggleFullscreenTimer();
         });
@@ -1492,10 +1511,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Add escape key listener
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isFullscreenTimerActive) {
+                console.log('Escape key pressed, exiting fullscreen');
                 toggleFullscreenTimer();
             }
         });
 
+        console.log('Fullscreen timer initialized successfully');
         return true;
     }
 
@@ -1510,8 +1531,23 @@ document.addEventListener('DOMContentLoaded', function () {
         // Initialize theme before app
         initializeTheme();
         
-        // Initialize fullscreen timer
-        initializeFullscreenTimer();
+        // Initialize fullscreen timer with retry mechanism
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        const tryInitFullscreen = () => {
+            if (initializeFullscreenTimer()) {
+                console.log("Fullscreen timer initialized successfully");
+            } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Retrying fullscreen timer initialization (${retryCount}/${maxRetries})`);
+                setTimeout(tryInitFullscreen, 100);
+            } else {
+                console.error("Failed to initialize fullscreen timer after", maxRetries, "attempts");
+            }
+        };
+        
+        tryInitFullscreen();
         
         initializeApp();
     }
