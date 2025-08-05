@@ -513,12 +513,114 @@
     body.retro-theme .glass a {
       color: #00ff00 !important;
     }
+
+    /* Fullscreen Timer Display */
+    #fullscreenTimer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #fullscreenTimer.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #fullscreenTimerHeader {
+      font-size: 6vw;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      user-select: none;
+      text-align: center;
+      margin-bottom: 2vw;
+      opacity: 0.8;
+    }
+
+    #fullscreenTimerDisplay {
+      font-size: 20vw;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      user-select: none;
+      text-align: center;
+      line-height: 1;
+    }
+
+    /* Retro theme fullscreen timer */
+    body.retro-theme #fullscreenTimer {
+      background: rgba(0, 0, 0, 0.98);
+    }
+
+    body.retro-theme #fullscreenTimerHeader {
+      color: #00ff00;
+      text-shadow: 0 0 30px #00ff00, 0 0 50px #00ff00;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    body.retro-theme #fullscreenTimerDisplay {
+      color: #00ff00;
+      text-shadow: 0 0 50px #00ff00, 0 0 100px #00ff00;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    /* Dark mode fullscreen timer */
+    body.dark-mode #fullscreenTimer {
+      background: rgba(0, 0, 0, 0.97);
+    }
+
+    body.dark-mode #fullscreenTimerHeader {
+      color: #f1f5f9;
+      text-shadow: 0 0 20px rgba(241, 245, 249, 0.2);
+    }
+
+    body.dark-mode #fullscreenTimerDisplay {
+      color: #f1f5f9;
+      text-shadow: 0 0 30px rgba(241, 245, 249, 0.3);
+    }
+
+    /* Timer display hover effect */
+    #timerDisplay {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #timerDisplay:hover {
+      transform: scale(1.05);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    body.retro-theme #timerDisplay:hover {
+      text-shadow: 0 0 30px #00ff00;
+    }
+
+    body.dark-mode #timerDisplay:hover {
+      text-shadow: 0 0 20px rgba(241, 245, 249, 0.3);
+    }
   </style>
 </head>
 
 <body class="bg-white text-gray-800 min-h-screen py-8">
   <!-- Fireworks Container -->
   <div id="fireworksContainer"></div>
+  
+  <!-- Fullscreen Timer Display -->
+  <div id="fullscreenTimer">
+    <div id="fullscreenTimerHeader">WORK</div>
+    <div id="fullscreenTimerDisplay">25:00</div>
+  </div>
   
   <!-- Ambient Background for Break Mode -->
   <div id="ambientBackground">
