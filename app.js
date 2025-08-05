@@ -943,8 +943,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (type === 'work') {
             timerDisplay.textContent = formattedTime;
+            // Update fullscreen timer if it's active and showing work timer
+            if (isFullscreenTimerActive && timerState.activeTimer === 'work') {
+                updateFullscreenTimer(formattedTime);
+            }
         } else {
             breakTimerDisplay.textContent = formattedTime;
+            // Update fullscreen timer if it's active and showing break timer
+            if (isFullscreenTimerActive && timerState.activeTimer === 'break') {
+                updateFullscreenTimer(formattedTime);
+            }
         }
     }
 
@@ -1398,6 +1406,99 @@ document.addEventListener('DOMContentLoaded', function () {
         tryInitTheme();
     }
 
+    // Fullscreen Timer Functions
+    let isFullscreenTimerActive = false;
+
+    function updateFullscreenTimer(timeString, timerType) {
+        const fullscreenDisplay = document.getElementById('fullscreenTimerDisplay');
+        const fullscreenHeader = document.getElementById('fullscreenTimerHeader');
+        
+        if (fullscreenDisplay && fullscreenHeader && isFullscreenTimerActive) {
+            fullscreenDisplay.textContent = timeString;
+            
+            // Update header based on active timer type
+            if (timerState.activeTimer === 'work') {
+                fullscreenHeader.textContent = 'WORK';
+            } else if (timerState.activeTimer === 'break') {
+                fullscreenHeader.textContent = 'BREAK';
+            } else {
+                fullscreenHeader.textContent = 'WORK'; // Default fallback
+            }
+        }
+    }
+
+    function toggleFullscreenTimer() {
+        const fullscreenTimer = document.getElementById('fullscreenTimer');
+        const fullscreenDisplay = document.getElementById('fullscreenTimerDisplay');
+        const fullscreenHeader = document.getElementById('fullscreenTimerHeader');
+        
+        if (!fullscreenTimer || !fullscreenDisplay || !fullscreenHeader) return;
+
+        if (isFullscreenTimerActive) {
+            // Exit fullscreen mode
+            fullscreenTimer.classList.remove('active');
+            isFullscreenTimerActive = false;
+        } else {
+            // Enter fullscreen mode - show the active timer
+            let currentTime, currentType;
+            
+            if (timerState.activeTimer === 'work') {
+                currentTime = timerDisplay.textContent;
+                currentType = 'WORK';
+            } else if (timerState.activeTimer === 'break') {
+                currentTime = breakTimerDisplay.textContent;
+                currentType = 'BREAK';
+            } else {
+                // Default to work timer if no timer is active
+                currentTime = timerDisplay.textContent;
+                currentType = 'WORK';
+            }
+            
+            fullscreenDisplay.textContent = currentTime;
+            fullscreenHeader.textContent = currentType;
+            fullscreenTimer.classList.add('active');
+            isFullscreenTimerActive = true;
+        }
+    }
+
+    function initializeFullscreenTimer() {
+        const timerDisplayElement = document.getElementById('timerDisplay');
+        const breakTimerDisplayElement = document.getElementById('breakTimerDisplay');
+        const fullscreenTimer = document.getElementById('fullscreenTimer');
+        
+        if (!timerDisplayElement || !breakTimerDisplayElement || !fullscreenTimer) {
+            console.warn('Fullscreen timer elements not found');
+            return false;
+        }
+
+        // Add click listener to work timer display
+        timerDisplayElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleFullscreenTimer();
+        });
+
+        // Add click listener to break timer display
+        breakTimerDisplayElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleFullscreenTimer();
+        });
+
+        // Add click listener to fullscreen timer to exit
+        fullscreenTimer.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleFullscreenTimer();
+        });
+
+        // Add escape key listener
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isFullscreenTimerActive) {
+                toggleFullscreenTimer();
+            }
+        });
+
+        return true;
+    }
+
     // Start the application with GitHub Pages compatibility
     async function startApp() {
         // Wait for complete DOM and resource loading
@@ -1408,6 +1509,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Initialize theme before app
         initializeTheme();
+        
+        // Initialize fullscreen timer
+        initializeFullscreenTimer();
         
         initializeApp();
     }
