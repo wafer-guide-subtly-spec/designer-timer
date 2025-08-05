@@ -1392,14 +1392,9 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
-        // Initialize dropdown as closed
-        dropdownMenu.style.maxHeight = '0px';
-        dropdownMenu.style.overflow = 'hidden';
-        dropdownMenu.style.transition = 'max-height 0.3s ease-in-out';
-        
         let isDropdownOpen = false;
 
-        // Toggle dropdown using the same pattern as settings dropdown
+        // Toggle dropdown - work with existing CSS classes
         dropdownToggle.addEventListener('click', (e) => {
             console.log('Theme dropdown clicked, current state:', isDropdownOpen);
             e.preventDefault();
@@ -1408,21 +1403,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isDropdownOpen) {
                 // Close the dropdown
                 console.log('Closing theme dropdown');
-                dropdownMenu.style.maxHeight = '0px';
+                dropdownMenu.classList.add('opacity-0', 'invisible');
                 isDropdownOpen = false;
             } else {
-                // Open the dropdown - calculate the actual content height
+                // Open the dropdown
                 console.log('Opening theme dropdown');
-                dropdownMenu.style.maxHeight = 'none';
-                const height = dropdownMenu.scrollHeight;
-                dropdownMenu.style.maxHeight = '0px';
-                console.log('Calculated height:', height);
-                
-                // Force reflow then animate
-                requestAnimationFrame(() => {
-                    dropdownMenu.style.maxHeight = height + 'px';
-                    isDropdownOpen = true;
-                });
+                dropdownMenu.classList.remove('opacity-0', 'invisible');
+                isDropdownOpen = true;
             }
             
             console.log('New state:', isDropdownOpen);
@@ -1439,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTheme(selectedTheme);
                 
                 // Close dropdown
-                dropdownMenu.style.maxHeight = '0px';
+                dropdownMenu.classList.add('opacity-0', 'invisible');
                 isDropdownOpen = false;
             });
         });
@@ -1447,7 +1434,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.style.maxHeight = '0px';
+                dropdownMenu.classList.add('opacity-0', 'invisible');
                 isDropdownOpen = false;
             }
         });
