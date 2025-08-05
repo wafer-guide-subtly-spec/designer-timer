@@ -472,10 +472,30 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => apiKeyInput.focus(), 100);
     }
 
+    // Test function to show fallback tip (for debugging)
+    window.testFallbackTip = function() {
+        console.log("Testing fallback tip...");
+        const tipContent = challengeDisplay.querySelector("div.text-xl");
+        if (tipContent) {
+            const fallbackTip = getRandomFallbackTip();
+            console.log("Fallback tip:", fallbackTip);
+            tipContent.innerHTML = `
+                <div class="mb-3">${fallbackTip}</div>
+                <div class="text-xs text-gray-400 font-normal italic">Test fallback tip</div>
+            `;
+        } else {
+            console.error("Tip content element not found");
+        }
+    };
+
     // Utility Functions
     async function updateDesignTip() {
+        console.log("updateDesignTip called");
         const tipContent = challengeDisplay.querySelector("div.text-xl");
-        if (!tipContent) return;
+        if (!tipContent) {
+            console.error("Tip content element not found");
+            return;
+        }
 
         // Show loading state
         tipContent.textContent = "Generating design tip...";
@@ -485,6 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const tip = await fetchDesignTipFromOpenAI();
+            console.log("Got tip from OpenAI:", tip);
             tipContent.textContent = tip;
             challengeDisplay.classList.remove("fade-in");
             void challengeDisplay.offsetWidth; // Force reflow
@@ -498,9 +519,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             switch (error.message) {
                 case 'API_KEY_NOT_CONFIGURED':
+                    console.log("No API key configured, showing fallback");
+                    const fallbackTip = getRandomFallbackTip();
                     tipContent.innerHTML = `
-                        <span>Configure your OpenAI API key to get dynamic tips!</span>
-                        <button onclick="showApiKeySettings()" class="ml-2 text-blue-500 underline">Settings</button>
+                        <div class="mb-3">${fallbackTip}</div>
+                        <div class="text-xs text-gray-400 font-normal italic">Configure your OpenAI API key for dynamic tips! <button onclick="showApiKeySettings()" class="text-blue-500 underline">Settings</button></div>
                     `;
                     return;
                     
@@ -541,6 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (showFallback) {
                 // Show fallback tip with a subtle indication it's offline
                 const fallbackTip = getRandomFallbackTip();
+                console.log("Showing fallback tip:", fallbackTip);
                 tipContent.innerHTML = `
                     <div class="mb-3">${fallbackTip}</div>
                     <div class="text-xs text-gray-400 font-normal italic">${errorMessage}</div>
@@ -908,8 +932,60 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Initialize Settings Dropdown Separately
+    function initializeSettingsDropdown() {
+        const settingsToggle = document.getElementById("settingsToggle");
+        const settingsPanel = document.getElementById("settingsPanel");
+        const settingsChevron = document.getElementById("settingsChevron");
+
+        console.log("Settings elements:", { settingsToggle, settingsPanel, settingsChevron });
+
+        if (settingsToggle && settingsPanel && settingsChevron) {
+            console.log("Adding settings dropdown listener");
+            
+            // Track state with JavaScript variable instead of relying on CSS
+            let isDropdownOpen = false;
+            
+            settingsToggle.addEventListener("click", (e) => {
+                console.log("Settings dropdown clicked, current state:", isDropdownOpen);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (isDropdownOpen) {
+                    // Close the panel
+                    console.log("Closing panel");
+                    settingsPanel.style.maxHeight = "0px";
+                    settingsChevron.style.transform = "rotate(0deg)";
+                    isDropdownOpen = false;
+                } else {
+                    // Open the panel
+                    console.log("Opening panel");
+                    const height = settingsPanel.scrollHeight;
+                    console.log("Calculated height:", height);
+                    
+                    settingsPanel.style.maxHeight = height + "px";
+                    settingsChevron.style.transform = "rotate(180deg)";
+                    isDropdownOpen = true;
+                }
+                
+                console.log("New state:", isDropdownOpen);
+            });
+            
+            return true;
+        } else {
+            console.warn("Settings dropdown elements not found:", {
+                settingsToggle: !!settingsToggle,
+                settingsPanel: !!settingsPanel, 
+                settingsChevron: !!settingsChevron
+            });
+            return false;
+        }
+    }
+
     // Initialize Application
     async function initializeApp() {
+        console.log("Initializing app...");
+        
         // Wait for Font Awesome to load
         await waitForFontAwesome();
         
@@ -928,8 +1004,47 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Setup event listeners
         setupEventListeners();
+        
+        // Initialize settings dropdown with retry
+        let retryCount = 0;
+        const maxRetries = 5;
+        
+        const tryInitSettings = () => {
+            if (initializeSettingsDropdown()) {
+                console.log("Settings dropdown initialized successfully");
+            } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Retrying settings dropdown initialization (${retryCount}/${maxRetries})`);
+                setTimeout(tryInitSettings, 100);
+            } else {
+                console.error("Failed to initialize settings dropdown after", maxRetries, "attempts");
+            }
+        };
+        
+        tryInitSettings();
     }
 
-    // Start the application
-    initializeApp();
+    // GitHub Pages Compatibility - Add additional DOM ready checks
+    function ensureDOMReady() {
+        return new Promise((resolve) => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+    }
+
+    // Start the application with GitHub Pages compatibility
+    async function startApp() {
+        // Wait for complete DOM and resource loading
+        await ensureDOMReady();
+        
+        // Additional delay for GitHub Pages
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        initializeApp();
+    }
+
+    startApp();
 });
