@@ -1392,25 +1392,40 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
+        // Initialize dropdown as closed
+        dropdownMenu.style.maxHeight = '0px';
+        dropdownMenu.style.overflow = 'hidden';
+        dropdownMenu.style.transition = 'max-height 0.3s ease-in-out';
+        
         let isDropdownOpen = false;
 
-        // Toggle dropdown
+        // Toggle dropdown using the same pattern as settings dropdown
         dropdownToggle.addEventListener('click', (e) => {
-            console.log('Theme dropdown clicked');
+            console.log('Theme dropdown clicked, current state:', isDropdownOpen);
             e.preventDefault();
             e.stopPropagation();
             
             if (isDropdownOpen) {
+                // Close the dropdown
                 console.log('Closing theme dropdown');
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                dropdownMenu.style.display = 'none';
+                dropdownMenu.style.maxHeight = '0px';
                 isDropdownOpen = false;
             } else {
+                // Open the dropdown - calculate the actual content height
                 console.log('Opening theme dropdown');
-                dropdownMenu.style.display = 'block';
-                dropdownMenu.classList.remove('opacity-0', 'invisible');
-                isDropdownOpen = true;
+                dropdownMenu.style.maxHeight = 'none';
+                const height = dropdownMenu.scrollHeight;
+                dropdownMenu.style.maxHeight = '0px';
+                console.log('Calculated height:', height);
+                
+                // Force reflow then animate
+                requestAnimationFrame(() => {
+                    dropdownMenu.style.maxHeight = height + 'px';
+                    isDropdownOpen = true;
+                });
             }
+            
+            console.log('New state:', isDropdownOpen);
         });
 
         // Handle theme selection
@@ -1424,8 +1439,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTheme(selectedTheme);
                 
                 // Close dropdown
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                dropdownMenu.style.display = 'none';
+                dropdownMenu.style.maxHeight = '0px';
                 isDropdownOpen = false;
             });
         });
@@ -1433,8 +1447,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.add('opacity-0', 'invisible');
-                dropdownMenu.style.display = 'none';
+                dropdownMenu.style.maxHeight = '0px';
                 isDropdownOpen = false;
             }
         });
