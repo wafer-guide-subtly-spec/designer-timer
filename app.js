@@ -568,8 +568,24 @@ document.addEventListener('DOMContentLoaded', function () {
         button.classList.add(newColorClass);
     }
 
-    function updateButton(button, { text = '', colorClass = '' }) {
-        if (text) button.innerHTML = text;
+    function updateButton(button, { text = '', colorClass = '', iconClass = '' }) {
+        if (text || iconClass) {
+            // Clear existing content
+            button.innerHTML = '';
+            
+            // Create icon element if specified
+            if (iconClass) {
+                const icon = document.createElement('i');
+                icon.className = iconClass + ' mr-2';
+                button.appendChild(icon);
+            }
+            
+            // Add text content
+            if (text) {
+                const textNode = document.createTextNode(text);
+                button.appendChild(textNode);
+            }
+        }
         if (colorClass) updateButtonColor(button, colorClass);
     }
 
@@ -578,33 +594,39 @@ document.addEventListener('DOMContentLoaded', function () {
         if (timerState.activeTimer === 'work' && timerState.isRunning) {
             // Work timer is running - work button shows "Pause" (orange), break button shows "Start" (green)
             updateButton(startWorkButton, {
-                text: '<i class="fas fa-pause mr-2"></i>Pause',
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
                 colorClass: "bg-yellow-600"
             });
             updateButton(startBreakButton, {
-                text: '<i class="fas fa-play mr-2"></i>Start',
+                text: 'Start',
+                iconClass: 'fas fa-play',
                 colorClass: "bg-green-500"
             });
             startBreakButton.disabled = false;
         } else if (timerState.activeTimer === 'break' && timerState.isRunning) {
             // Break timer is running - break button shows "Pause" (orange), work button shows "Start" (green)
             updateButton(startBreakButton, {
-                text: '<i class="fas fa-pause mr-2"></i>Pause',
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
                 colorClass: "bg-yellow-600"
             });
             updateButton(startWorkButton, {
-                text: '<i class="fas fa-play mr-2"></i>Start',
+                text: 'Start',
+                iconClass: 'fas fa-play',
                 colorClass: "bg-green-500"
             });
             startBreakButton.disabled = false;
         } else {
             // No timer running - both buttons show "Start" (green)
             updateButton(startWorkButton, {
-                text: '<i class="fas fa-play mr-2"></i>Start',
+                text: 'Start',
+                iconClass: 'fas fa-play',
                 colorClass: "bg-green-500"
             });
             updateButton(startBreakButton, {
-                text: '<i class="fas fa-play mr-2"></i>Start',
+                text: 'Start',
+                iconClass: 'fas fa-play',
                 colorClass: "bg-green-500"
             });
             startBreakButton.disabled = timerState.activeTimer === null;
@@ -800,6 +822,25 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.toggle("dark-mode");
             updateDarkModeButton();
         });
+
+        // Settings Dropdown Toggle
+        const settingsToggle = document.getElementById("settingsToggle");
+        const settingsPanel = document.getElementById("settingsPanel");
+        const settingsChevron = document.getElementById("settingsChevron");
+
+        settingsToggle.addEventListener("click", () => {
+            const isOpen = settingsPanel.style.maxHeight !== "0px";
+            
+            if (isOpen) {
+                // Close the panel
+                settingsPanel.style.maxHeight = "0px";
+                settingsChevron.style.transform = "rotate(0deg)";
+            } else {
+                // Open the panel
+                settingsPanel.style.maxHeight = settingsPanel.scrollHeight + "px";
+                settingsChevron.style.transform = "rotate(180deg)";
+            }
+        });
     }
 
     // Dark Mode Button Update Function
@@ -815,8 +856,48 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Font Awesome Loading Check
+    function waitForFontAwesome() {
+        return new Promise((resolve) => {
+            // Check if Font Awesome is already loaded
+            if (document.querySelector('.fas, .fa')) {
+                resolve();
+                return;
+            }
+            
+            // Wait for Font Awesome to load
+            const checkInterval = setInterval(() => {
+                const testElement = document.createElement('i');
+                testElement.className = 'fas fa-play';
+                testElement.style.position = 'absolute';
+                testElement.style.visibility = 'hidden';
+                document.body.appendChild(testElement);
+                
+                const computedStyle = window.getComputedStyle(testElement);
+                const fontFamily = computedStyle.getPropertyValue('font-family');
+                
+                document.body.removeChild(testElement);
+                
+                // Font Awesome is loaded when font-family contains "Font Awesome"
+                if (fontFamily.includes('Font Awesome') || fontFamily.includes('FontAwesome')) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 100);
+            
+            // Fallback timeout after 5 seconds
+            setTimeout(() => {
+                clearInterval(checkInterval);
+                resolve();
+            }, 5000);
+        });
+    }
+
     // Initialize Application
-    function initializeApp() {
+    async function initializeApp() {
+        // Wait for Font Awesome to load
+        await waitForFontAwesome();
+        
         // Initialize timer displays
         updateTimerDisplay(workTime, 'work');
         updateTimerDisplay(breakTime, 'break');
