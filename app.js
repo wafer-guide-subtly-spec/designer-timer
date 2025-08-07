@@ -934,6 +934,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             startBreakButton.disabled = timerState.activeTimer === null;
         }
+        
+        // Update fullscreen button state
+        updateFullscreenButton();
     }
 
     function updateTimerDisplay(time, type) {
@@ -1050,6 +1053,34 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Update button states
         updateButtonStates();
+    }
+
+    function updateFullscreenButton() {
+        const fullscreenButton = document.getElementById('fullscreenStartPauseButton');
+        if (!fullscreenButton) return;
+
+        if (timerState.activeTimer === 'work' && timerState.isRunning) {
+            // Work timer is running - show pause button
+            updateButton(fullscreenButton, {
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
+                colorClass: "bg-yellow-600"
+            });
+        } else if (timerState.activeTimer === 'break' && timerState.isRunning) {
+            // Break timer is running - show pause button
+            updateButton(fullscreenButton, {
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
+                colorClass: "bg-yellow-600"
+            });
+        } else {
+            // No timer running or timer is paused - show start button
+            updateButton(fullscreenButton, {
+                text: 'Start',
+                iconClass: 'fas fa-play',
+                colorClass: "bg-green-500"
+            });
+        }
     }
 
     function pauseTimer() {
@@ -1407,7 +1438,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Fullscreen Timer Functions
-    let isFullscreenTimerActive = false;
+    let isFullscreenTimerActive = true; // Start in fullscreen mode by default
 
     function updateFullscreenTimer(timeString, timerType) {
         const fullscreenDisplay = document.getElementById('fullscreenTimerDisplay');
@@ -1424,6 +1455,34 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 fullscreenHeader.textContent = 'WORK'; // Default fallback
             }
+        }
+    }
+
+    function updateFullscreenButton() {
+        const fullscreenButton = document.getElementById('fullscreenStartPauseButton');
+        if (!fullscreenButton) return;
+
+        if (timerState.activeTimer === 'work' && timerState.isRunning) {
+            // Work timer is running - show pause button
+            updateButton(fullscreenButton, {
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
+                colorClass: "bg-yellow-600"
+            });
+        } else if (timerState.activeTimer === 'break' && timerState.isRunning) {
+            // Break timer is running - show pause button
+            updateButton(fullscreenButton, {
+                text: 'Pause',
+                iconClass: 'fas fa-pause',
+                colorClass: "bg-yellow-600"
+            });
+        } else {
+            // No timer running or timer is paused - show start button
+            updateButton(fullscreenButton, {
+                text: 'Start',
+                iconClass: 'fas fa-play',
+                colorClass: "bg-green-500"
+            });
         }
     }
 
@@ -1501,12 +1560,44 @@ document.addEventListener('DOMContentLoaded', function () {
             toggleFullscreenTimer();
         });
 
-        // Add click listener to fullscreen timer to exit
+        // Add click listener to fullscreen timer to exit (but not the button)
         fullscreenTimer.addEventListener('click', (e) => {
+            // Don't exit fullscreen if clicking the button
+            if (e.target.id === 'fullscreenStartPauseButton' || e.target.closest('#fullscreenStartPauseButton')) {
+                return;
+            }
             console.log('Fullscreen timer clicked to exit');
             e.preventDefault();
             toggleFullscreenTimer();
         });
+
+        // Add click listener to fullscreen start/pause button
+        const fullscreenButton = document.getElementById('fullscreenStartPauseButton');
+        if (fullscreenButton) {
+            fullscreenButton.addEventListener('click', (e) => {
+                console.log('Fullscreen button clicked');
+                e.preventDefault();
+                e.stopPropagation(); // Prevent triggering the fullscreen exit
+                
+                // Determine which timer to start/pause based on current state
+                if (timerState.activeTimer === 'work' && timerState.isRunning) {
+                    // Work timer is running, pause it
+                    pauseTimer();
+                } else if (timerState.activeTimer === 'break' && timerState.isRunning) {
+                    // Break timer is running, pause it
+                    pauseTimer();
+                } else if (timerState.activeTimer === 'work') {
+                    // Work timer is paused, resume it
+                    startTimer('work');
+                } else if (timerState.activeTimer === 'break') {
+                    // Break timer is paused, resume it
+                    startTimer('break');
+                } else {
+                    // No timer active, start work timer by default
+                    startTimer('work');
+                }
+            });
+        }
 
         // Add escape key listener
         document.addEventListener('keydown', (e) => {
@@ -1550,6 +1641,27 @@ document.addEventListener('DOMContentLoaded', function () {
         tryInitFullscreen();
         
         initializeApp();
+        
+        // Show fullscreen timer by default after initialization
+        setTimeout(() => {
+            const fullscreenTimer = document.getElementById('fullscreenTimer');
+            const fullscreenDisplay = document.getElementById('fullscreenTimerDisplay');
+            const fullscreenHeader = document.getElementById('fullscreenTimerHeader');
+            
+            if (fullscreenTimer && fullscreenDisplay && fullscreenHeader) {
+                // Set initial values
+                fullscreenDisplay.textContent = timerDisplay.textContent;
+                fullscreenHeader.textContent = 'WORK';
+                
+                // Show the fullscreen timer
+                fullscreenTimer.classList.add('active');
+                
+                // Update button state
+                updateFullscreenButton();
+                
+                console.log('Fullscreen timer activated by default');
+            }
+        }, 300); // Small delay to ensure all elements are ready
     }
 
     startApp();
